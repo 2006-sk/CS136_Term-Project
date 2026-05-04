@@ -1,0 +1,26 @@
+Robustness Analysis Summary
+===========================
+
+Pipeline: clean image -> distortion -> optional Gaussian preprocessing -> Canny/Sobel edges + texture segmentation.
+Scores compare each distorted output with the matching clean-image baseline. Higher F1 means better stability.
+
+Average edge stability by distortion and preprocessing:
+
+gaussian_noise:
+- raw: Canny F1=0.304, Sobel F1=0.578, segmentation boundary F1=0.220
+- gaussian_filtered: Canny F1=0.684, Sobel F1=0.822, segmentation boundary F1=0.309
+
+blur:
+- raw: Canny F1=0.171, Sobel F1=0.595, segmentation boundary F1=0.245
+- gaussian_filtered: Canny F1=0.346, Sobel F1=0.714, segmentation boundary F1=0.255
+
+low_contrast:
+- raw: Canny F1=0.483, Sobel F1=0.981, segmentation boundary F1=0.556
+- gaussian_filtered: Canny F1=0.443, Sobel F1=0.965, segmentation boundary F1=0.536
+
+Short written analysis:
+- Under Gaussian noise, Canny averaged 0.304 F1 and Sobel averaged 0.578 F1 against the clean baseline.
+- Canny usually suppresses weak noisy gradients better because of non-maximum suppression and hysteresis thresholds.
+- Sobel is more sensitive to noise because every local intensity fluctuation contributes directly to gradient magnitude.
+- Gaussian filtering before edge detection generally helps noisy inputs by smoothing small fluctuations before gradients are computed.
+- Blur and low contrast reduce edge strength, so both edge detectors can lose fine boundaries; segmentation boundaries also become less stable when texture contrast disappears.

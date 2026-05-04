@@ -21,7 +21,7 @@ DATASET_FOLDERS: Dict[str, Tuple[str, ...]] = {
     "Geology": ("Geology",),
     "Anthropology": ("Anthropology",),
 }
-OUTPUT_FOLDER = "Gaussian_Filter_Images"
+OUTPUT_FOLDER = "output_images"
 GAUSSIAN_KERNEL = (5, 5)
 GAUSSIAN_SIGMA = 1.5
 

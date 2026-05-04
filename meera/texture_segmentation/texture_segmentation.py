@@ -21,7 +21,7 @@ DATASET_FOLDERS: Dict[str, Tuple[str, ...]] = {
     "Geology": ("Geology",),
     "Anthropology": ("Anthropology",),
 }
-OUTPUT_FOLDER = "Texture_Segmentation_Images"
+OUTPUT_FOLDER = "output_images"
 SEGMENT_COUNT = 4
 KMEANS_ATTEMPTS = 5
 

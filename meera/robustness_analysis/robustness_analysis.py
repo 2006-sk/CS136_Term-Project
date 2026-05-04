@@ -21,7 +21,7 @@ DATASET_FOLDERS: Dict[str, Tuple[str, ...]] = {
     "Geology": ("Geology",),
     "Anthropology": ("Anthropology",),
 }
-OUTPUT_FOLDER = "Robustness_Analysis_Images"
+OUTPUT_FOLDER = "output_images"
 SUBSET_PER_DATASET = 3
 RANDOM_SEED = 136
 SEGMENT_COUNT = 4
