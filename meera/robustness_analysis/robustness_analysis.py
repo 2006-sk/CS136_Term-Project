@@ -16,7 +16,7 @@ from utils.image_loader import load_images_from_folder
 
 def main() -> None:
     # TODO: Add noise/transform stress tests and quantitative robustness metrics.
-    dataset_dir = os.path.join(_ROOT, "datasets", "anthropology")
+    dataset_dir = os.path.join(_ROOT, "datasets", "Anthropology")
     images = load_images_from_folder(dataset_dir)
 
     out_dir = os.path.join(os.path.dirname(__file__), "output_images")

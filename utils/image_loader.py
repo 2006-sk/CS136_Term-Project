@@ -8,7 +8,7 @@ import numpy as np
 
 
 def load_images_from_folder(folder_path: str) -> List[Tuple[str, np.ndarray]]:
-    """Load all ``.jpg`` / ``.jpeg`` / ``.png`` images from a directory.
+    """Load all ``.jpg`` / ``.jpeg`` / ``.png`` images from a directory (any case).
 
     Parameters
     ----------

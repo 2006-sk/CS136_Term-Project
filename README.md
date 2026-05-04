@@ -6,7 +6,7 @@ This repository contains coursework experiments for CS136, organized by contribu
 
 ## Repository layout
 
-- `datasets/` — place `.jpg` / `.png` imagery under `marine_science/`, `geology/`, or `anthropology/` (tracked via `.gitkeep` until you add files).
+- `datasets/` — imagery lives under `MarineBiology/`, `Geology/`, and `Anthropology/` (`.jpg`, `.jpeg`, `.png`, case-insensitive).
 - `meera/` — Gaussian filtering, texture segmentation, and robustness analysis pipelines.
 - `shresth/` — edge detection, Hough transforms, edge evaluation, and a creative exploration script.
 - `utils/` — shared helpers such as `image_loader.load_images_from_folder`.

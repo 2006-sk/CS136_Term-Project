@@ -16,7 +16,7 @@ from utils.image_loader import load_images_from_folder
 
 def main() -> None:
     # TODO: Implement Gaussian blur parameters, comparison plots, and reporting.
-    dataset_dir = os.path.join(_ROOT, "datasets", "marine_science")
+    dataset_dir = os.path.join(_ROOT, "datasets", "MarineBiology")
     images = load_images_from_folder(dataset_dir)
 
     out_dir = os.path.join(os.path.dirname(__file__), "output_images")
