@@ -2,6 +2,4 @@ __pycache__/
 pycache/
 .DS_Store
 *.pyc
-**/output_images/*.jpg
-**/output_images/*.jpeg
-**/output_images/*.png
+.venv/
