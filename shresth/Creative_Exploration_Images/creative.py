@@ -1,4 +1,4 @@
-"""Creative exploration: CLAHE + Canny edge detection only.
+"""Creative exploration: CLAHE + Canny edge detection.
 
 Scans every image under the three dataset theme folders (on disk: MarineBiology,
 Geology, Anthropology). Writes two PNGs per discovered image into this directory
