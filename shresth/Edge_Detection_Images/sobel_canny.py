@@ -1,39 +1,55 @@
-"""Sobel and Canny edge detection for the CS136 term project."""
+"""Sobel and Canny edge detection for the CS136 term project.
+
+Scans every image under the three dataset theme folders (on disk: MarineBiology,
+Geology, Anthropology — marine_science / geology / anthropology). Output PNGs are
+not fixed filenames: for each discovered image this script writes four files into
+this same directory at runtime (plain_sobel_x_*, plain_sobel_y_*, etc.).
+"""
 
 import os
-import sys
 
 import cv2
 import numpy as np
 
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if _ROOT not in sys.path:
-    sys.path.insert(0, _ROOT)
 
-from utils.image_loader import load_images_from_folder
-
+# Repository folder names under datasets/ (themes: marine_science, geology, anthropology)
 _DATASET_SUBDIRS = ("MarineBiology", "Geology", "Anthropology")
 
 
-def _load_all_dataset_images():
-    all_items = []
+def _is_image_filename(name: str) -> bool:
+    lower = name.lower()
+    return lower.endswith((".jpg", ".jpeg", ".png"))
+
+
+def discover_all_dataset_images():
+    """Walk each dataset subfolder with os.listdir; yield (subfolder, filename, BGR image)."""
     for sub in _DATASET_SUBDIRS:
         folder = os.path.join(_ROOT, "datasets", sub)
-        for name, img in load_images_from_folder(folder):
-            all_items.append((name, img))
-    return all_items
+        if not os.path.isdir(folder):
+            continue
+        for fname in sorted(os.listdir(folder)):
+            if not _is_image_filename(fname):
+                continue
+            path = os.path.join(folder, fname)
+            if not os.path.isfile(path):
+                continue
+            bgr = cv2.imread(path, cv2.IMREAD_COLOR)
+            if bgr is None:
+                continue
+            yield sub, fname, bgr
 
 
 def main() -> None:
-    images = _load_all_dataset_images()
     out_dir = os.path.dirname(os.path.abspath(__file__))
     os.makedirs(out_dir, exist_ok=True)
 
+    images = list(discover_all_dataset_images())
     if not images:
         print("No images found under datasets/. Expected MarineBiology, Geology, Anthropology.")
         return
 
-    for filename, bgr in images:
+    for sub, filename, bgr in images:
         gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
 
         gx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
@@ -44,7 +60,8 @@ def main() -> None:
 
         plain_canny = cv2.Canny(gray, 100, 200)
 
-        stem, _ = os.path.splitext(filename)
+        base, _ = os.path.splitext(filename)
+        stem = f"{sub}_{base}"
 
         cv2.imwrite(os.path.join(out_dir, f"plain_sobel_x_{stem}.png"), sobel_x)
         cv2.imwrite(os.path.join(out_dir, f"plain_sobel_y_{stem}.png"), sobel_y)

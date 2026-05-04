@@ -1,27 +1,41 @@
-"""Hough transform line and circle detection for the CS136 term project."""
+"""Hough transform line and circle detection for the CS136 term project.
+
+Scans every image under the three dataset theme folders (on disk: MarineBiology,
+Geology, Anthropology). Output PNGs are generated per image at runtime in this
+directory (hough_circles_*, hough_lines_*); nothing is hardcoded to a fixed count.
+"""
 
 import os
-import sys
 
 import cv2
 import numpy as np
 
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if _ROOT not in sys.path:
-    sys.path.insert(0, _ROOT)
-
-from utils.image_loader import load_images_from_folder
 
 _DATASET_SUBDIRS = ("MarineBiology", "Geology", "Anthropology")
 
 
-def _load_all_dataset_images():
-    all_items = []
+def _is_image_filename(name: str) -> bool:
+    lower = name.lower()
+    return lower.endswith((".jpg", ".jpeg", ".png"))
+
+
+def discover_all_dataset_images():
+    """Walk each dataset subfolder with os.listdir; yield (rel_key, filename, BGR image)."""
     for sub in _DATASET_SUBDIRS:
         folder = os.path.join(_ROOT, "datasets", sub)
-        for name, img in load_images_from_folder(folder):
-            all_items.append((f"{sub}/{name}", name, img))
-    return all_items
+        if not os.path.isdir(folder):
+            continue
+        for fname in sorted(os.listdir(folder)):
+            if not _is_image_filename(fname):
+                continue
+            path = os.path.join(folder, fname)
+            if not os.path.isfile(path):
+                continue
+            bgr = cv2.imread(path, cv2.IMREAD_COLOR)
+            if bgr is None:
+                continue
+            yield f"{sub}/{fname}", fname, bgr
 
 
 def _resize_for_hough(bgr: np.ndarray, max_side: int = 800):
@@ -38,10 +52,10 @@ def _resize_for_hough(bgr: np.ndarray, max_side: int = 800):
 
 
 def main() -> None:
-    images = _load_all_dataset_images()
     out_dir = os.path.dirname(os.path.abspath(__file__))
     os.makedirs(out_dir, exist_ok=True)
 
+    images = list(discover_all_dataset_images())
     if not images:
         print("No images found under datasets/. Expected MarineBiology, Geology, Anthropology.")
         return
@@ -76,7 +90,9 @@ def main() -> None:
             maxLineGap=12,
         )
 
-        stem, _ = os.path.splitext(filename)
+        sub, _sep, base_name = rel_key.partition("/")
+        base, _ = os.path.splitext(base_name)
+        stem = f"{sub}_{base}"
 
         circles_img = bgr.copy()
         n_circles = 0

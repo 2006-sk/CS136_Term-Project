@@ -1,41 +1,55 @@
-"""Creative exploration: CLAHE + Canny edge detection only."""
+"""Creative exploration: CLAHE + Canny edge detection only.
+
+Scans every image under the three dataset theme folders (on disk: MarineBiology,
+Geology, Anthropology). Writes two PNGs per discovered image into this directory
+at runtime; image counts are not fixed.
+"""
 
 import os
-import sys
 
 import cv2
 import numpy as np
 
 _ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-if _ROOT not in sys.path:
-    sys.path.insert(0, _ROOT)
-
-from utils.image_loader import load_images_from_folder
 
 _DATASET_SUBDIRS = ("MarineBiology", "Geology", "Anthropology")
 
 
-def _load_all_dataset_images():
-    items = []
+def _is_image_filename(name: str) -> bool:
+    lower = name.lower()
+    return lower.endswith((".jpg", ".jpeg", ".png"))
+
+
+def discover_all_dataset_images():
+    """Walk each dataset subfolder with os.listdir; yield (subfolder, filename, BGR image)."""
     for sub in _DATASET_SUBDIRS:
         folder = os.path.join(_ROOT, "datasets", sub)
-        for filename, img in load_images_from_folder(folder):
-            items.append((filename, img))
-    return items
+        if not os.path.isdir(folder):
+            continue
+        for fname in sorted(os.listdir(folder)):
+            if not _is_image_filename(fname):
+                continue
+            path = os.path.join(folder, fname)
+            if not os.path.isfile(path):
+                continue
+            bgr = cv2.imread(path, cv2.IMREAD_COLOR)
+            if bgr is None:
+                continue
+            yield sub, fname, bgr
 
 
 def main() -> None:
-    images = _load_all_dataset_images()
     out_dir = os.path.dirname(os.path.abspath(__file__))
     os.makedirs(out_dir, exist_ok=True)
 
+    images = list(discover_all_dataset_images())
     if not images:
         print("No images found under datasets/. Expected MarineBiology, Geology, Anthropology.")
         return
 
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 
-    for filename, bgr in images:
+    for sub, filename, bgr in images:
         gray = cv2.cvtColor(bgr, cv2.COLOR_BGR2GRAY)
 
         plain_canny = cv2.Canny(gray, 100, 200)
@@ -43,7 +57,8 @@ def main() -> None:
         clahe_gray = clahe.apply(gray)
         clahe_canny = cv2.Canny(clahe_gray, 100, 200)
 
-        stem, _ = os.path.splitext(filename)
+        base, _ = os.path.splitext(filename)
+        stem = f"{sub}_{base}"
 
         cv2.imwrite(os.path.join(out_dir, f"plain_canny_{stem}.png"), plain_canny)
         cv2.imwrite(os.path.join(out_dir, f"clahe_canny_{stem}.png"), clahe_canny)
