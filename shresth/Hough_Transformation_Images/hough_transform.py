@@ -2,7 +2,8 @@
 
 Scans every image under the three dataset theme folders (on disk: MarineBiology,
 Geology, Anthropology). Output PNGs are generated per image at runtime in this
-directory (hough_circles_*, hough_lines_*); nothing is hardcoded to a fixed count.
+module's output_images/ directory (hough_circles_*, hough_lines_*); nothing is
+hardcoded to a fixed count.
 """
 
 import os
@@ -52,7 +53,7 @@ def _resize_for_hough(bgr: np.ndarray, max_side: int = 800):
 
 
 def main() -> None:
-    out_dir = os.path.dirname(os.path.abspath(__file__))
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output_images")
     os.makedirs(out_dir, exist_ok=True)
 
     images = list(discover_all_dataset_images())

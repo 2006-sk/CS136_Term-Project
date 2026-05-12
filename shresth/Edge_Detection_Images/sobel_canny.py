@@ -1,9 +1,10 @@
 """Sobel and Canny edge detection for the CS136 term project.
 
 Scans every image under the three dataset theme folders (on disk: MarineBiology,
-Geology, Anthropology — marine_science / geology / anthropology). Output PNGs are
+Geology, Anthropology - marine_science / geology / anthropology). Output PNGs are
 not fixed filenames: for each discovered image this script writes four files into
-this same directory at runtime (plain_sobel_x_*, plain_sobel_y_*, etc.).
+the local output_images/ directory at runtime (plain_sobel_x_*, plain_sobel_y_*,
+etc.).
 """
 
 import os
@@ -41,7 +42,7 @@ def discover_all_dataset_images():
 
 
 def main() -> None:
-    out_dir = os.path.dirname(os.path.abspath(__file__))
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output_images")
     os.makedirs(out_dir, exist_ok=True)
 
     images = list(discover_all_dataset_images())

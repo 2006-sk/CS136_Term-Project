@@ -1,7 +1,7 @@
 """Creative exploration: CLAHE + Canny edge detection.
 
 Scans every image under the three dataset theme folders (on disk: MarineBiology,
-Geology, Anthropology). Writes two PNGs per discovered image into this directory
+Geology, Anthropology). Writes two PNGs per discovered image into output_images/
 at runtime; image counts are not fixed.
 """
 
@@ -39,7 +39,7 @@ def discover_all_dataset_images():
 
 
 def main() -> None:
-    out_dir = os.path.dirname(os.path.abspath(__file__))
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output_images")
     os.makedirs(out_dir, exist_ok=True)
 
     images = list(discover_all_dataset_images())

@@ -8,6 +8,30 @@ This project contains classical computer vision experiments for CS136. The code 
 
 The repository is organized by contributor and algorithm. Meera's work focuses on Gaussian filtering, texture segmentation, and robustness analysis. Shresth's work focuses on Sobel/Canny edge detection, Hough line/circle detection, edge detector evaluation, and a creative CLAHE + Canny exploration.
 
+## What Happened
+
+This repository was built as a CS136 term project around a shared set of scientific images. The team collected input images into `datasets/`, organized the work by contributor, wrote separate Python scripts for each computer vision technique, and generated output images that show how each algorithm behaves on marine biology, geology, and anthropology examples.
+
+The first major step was setting up the project structure. The root `datasets/` folder became the shared input location, while `meera/`, `shresth/`, and `utils/` separated contributor work from shared helpers. A small `requirements.txt` file defines the Python dependencies, and `.gitignore` keeps local environment files such as `.venv/`, Python caches, and macOS metadata out of version control. Empty output folders are preserved with `.gitkeep` files so the directory structure remains visible even before new outputs are generated.
+
+Next, the dataset loading behavior was standardized. The helper in `utils/image_loader.py` loads supported image files from a folder in sorted order and returns OpenCV BGR arrays. This gave Meera's scripts a consistent way to discover `.jpg`, `.jpeg`, and `.png` files while safely skipping unreadable images. Shresth's scripts use their own lightweight folder scanning with the same expected dataset categories: `MarineBiology`, `Geology`, and `Anthropology`.
+
+After the data layout was ready, Meera's Gaussian filtering pipeline was added. It reads every dataset image, applies a `(5, 5)` Gaussian blur with sigma `1.5`, saves the filtered image, and also creates a side-by-side comparison figure. This step shows how smoothing reduces fine detail and noise before later image processing tasks.
+
+The next major experiment was Meera's texture segmentation pipeline. It converts each image into features based on grayscale intensity, local mean, local standard deviation, Laplacian edge energy, and LAB color channels. OpenCV k-means clustering groups pixels into four texture/color regions. The output includes grayscale texture labels, color-aware texture labels, average-color segmented images, and preview panels. This made it easier to compare visual regions that are not necessarily captured by edge detectors alone.
+
+Meera then added a robustness analysis workflow to test how stable edge detection and segmentation are under image distortions. The script creates clean, Gaussian-noise, blur, and low-contrast versions of selected dataset images. It compares raw processing against Gaussian-preprocessed processing, then measures Canny edges, Sobel edges, and segmentation boundaries against clean-image baselines. The summary showed that Gaussian preprocessing strongly improved noisy and blurred cases, especially for Canny and Sobel edge maps.
+
+Shresth's first major pipeline applies Sobel and Canny edge detection across all dataset images. Each image is converted to grayscale, processed with Sobel X, Sobel Y, combined Sobel magnitude, and fixed-threshold Canny. The resulting images make it possible to visually compare directional gradients, overall gradient strength, and thinner Canny contours.
+
+Shresth also added an edge detector evaluation script. Instead of only saving visual outputs, this script prints numeric metrics for Sobel-Otsu and Canny: edge density percentage, mean gradient magnitude at edge pixels, and average connected-component area. It also saves bar charts for each dataset theme. This gave the project a quantitative comparison between broader Sobel gradient coverage and more localized Canny contours.
+
+The Hough transformation script was added to detect geometric structure. Because some dataset images are large, the script temporarily downsizes images for faster Hough computation, then scales detected circles and line segments back onto full-resolution copies. It saves one circle-detection output and one line-detection output per image, plus terminal messages reporting how many shapes were detected.
+
+Finally, the creative exploration tested CLAHE before Canny edge detection. CLAHE improves local contrast before Canny runs, which can reveal faint edges in uneven lighting or low-contrast image regions. The script saves plain Canny outputs and CLAHE-enhanced Canny outputs side by side as separate files. The written notes in `creative.py` explain why this method is useful for underwater, geological, and artifact-like images.
+
+The final result is a reproducible project with input datasets, runnable scripts, generated outputs, and written documentation. The code can be rerun from the repository root to regenerate the images and metrics, and the README explains what each script does, what it expects as input, where it writes outputs, and how to interpret the main results.
+
 ## Project Goals
 
 - Apply core computer vision techniques to real scientific imagery instead of only synthetic examples.
@@ -41,13 +65,17 @@ term_project/
 |       `-- output_images/
 |-- shresth/
 |   |-- Creative_Exploration_Images/
-|   |   `-- creative.py
+|   |   |-- creative.py
+|   |   `-- output_images/
 |   |-- Edge_Detection_Images/
-|   |   `-- sobel_canny.py
+|   |   |-- sobel_canny.py
+|   |   `-- output_images/
 |   |-- Edge_Detector_Evaluation_Images/
-|   |   `-- edge_evaluation.py
+|   |   |-- edge_evaluation.py
+|   |   `-- output_images/
 |   `-- Hough_Transformation_Images/
-|       `-- hough_transform.py
+|       |-- hough_transform.py
+|       `-- output_images/
 `-- utils/
     `-- image_loader.py
 ```
@@ -58,7 +86,7 @@ Important notes about the layout:
 - `datasets/` contains the input images used by all scripts.
 - `utils/image_loader.py` is the shared image loading helper used by Meera's scripts.
 - Meera's scripts save generated files inside nested `output_images/` folders.
-- Shresth's scripts save generated files directly into their corresponding `_Images` folders.
+- Shresth's scripts stay in their corresponding `_Images` folders and save generated files into local `output_images/` subfolders.
 - `.gitkeep` files are present so empty output folders can remain tracked by Git.
 - `.gitignore` excludes local Python caches, `.DS_Store`, `.pyc` files, and the local `.venv/`.
 
@@ -352,7 +380,7 @@ python shresth/Edge_Detection_Images/sobel_canny.py
 
 Outputs:
 
-- Output folder: `shresth/Edge_Detection_Images/`
+- Output folder: `shresth/Edge_Detection_Images/output_images/`
 - `plain_sobel_x_<dataset>_<image_stem>.png`
 - `plain_sobel_y_<dataset>_<image_stem>.png`
 - `plain_sobel_combined_<dataset>_<image_stem>.png`
@@ -387,7 +415,7 @@ python shresth/Edge_Detector_Evaluation_Images/edge_evaluation.py
 
 Outputs:
 
-- Output folder: `shresth/Edge_Detector_Evaluation_Images/`
+- Output folder: `shresth/Edge_Detector_Evaluation_Images/output_images/`
 - `bar_marine_science.png`
 - `bar_geology.png`
 - `bar_anthropology.png`
@@ -442,7 +470,7 @@ python shresth/Hough_Transformation_Images/hough_transform.py
 
 Outputs:
 
-- Output folder: `shresth/Hough_Transformation_Images/`
+- Output folder: `shresth/Hough_Transformation_Images/output_images/`
 - `hough_circles_<dataset>_<image_stem>.png`
 - `hough_lines_<dataset>_<image_stem>.png`
 - Terminal messages reporting the number of circles and line segments detected per image.
@@ -473,7 +501,7 @@ python shresth/Creative_Exploration_Images/creative.py
 
 Outputs:
 
-- Output folder: `shresth/Creative_Exploration_Images/`
+- Output folder: `shresth/Creative_Exploration_Images/output_images/`
 - `plain_canny_<dataset>_<image_stem>.png`
 - `clahe_canny_<dataset>_<image_stem>.png`
 
@@ -493,10 +521,10 @@ Current generated output summary:
 - `meera/gaussian_filter/output_images/` contains Gaussian-filtered images and side-by-side comparisons.
 - `meera/texture_segmentation/output_images/` contains grayscale texture labels, color texture labels, average-color segmentations, and preview panels.
 - `meera/robustness_analysis/output_images/` contains distorted images, edge maps, segmentation maps, summary panels, and a written robustness summary.
-- `shresth/Edge_Detection_Images/` contains Sobel X, Sobel Y, combined Sobel, and Canny outputs.
-- `shresth/Edge_Detector_Evaluation_Images/` contains edge detector evaluation bar charts.
-- `shresth/Hough_Transformation_Images/` contains Hough circle and Hough line outputs.
-- `shresth/Creative_Exploration_Images/` contains plain Canny and CLAHE-enhanced Canny outputs.
+- `shresth/Edge_Detection_Images/output_images/` contains Sobel X, Sobel Y, combined Sobel, and Canny outputs.
+- `shresth/Edge_Detector_Evaluation_Images/output_images/` contains edge detector evaluation bar charts.
+- `shresth/Hough_Transformation_Images/output_images/` contains Hough circle and Hough line outputs.
+- `shresth/Creative_Exploration_Images/output_images/` contains plain Canny and CLAHE-enhanced Canny outputs.
 
 ## File Naming Conventions
 

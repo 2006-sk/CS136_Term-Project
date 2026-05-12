@@ -1,9 +1,9 @@
 """Quantitative edge detector evaluation (Sobel vs Canny) for the CS136 term project.
 
 Scans every image under the three dataset theme folders (on disk: MarineBiology,
-Geology, Anthropology) using os.listdir per folder — counts are not fixed. Bar chart
-PNG names (bar_marine_science.png, etc.) are fixed summary outputs; per-image metrics
-come from whatever images were discovered.
+Geology, Anthropology) using os.listdir per folder - counts are not fixed. Bar
+chart PNG names (bar_marine_science.png, etc.) are fixed summary outputs written
+to output_images/; per-image metrics come from whatever images were discovered.
 """
 
 import os
@@ -84,7 +84,7 @@ def _metrics_for_mask(mask: np.ndarray, mag_float: np.ndarray) -> dict:
 
 def main() -> None:
     images = list(discover_all_dataset_images())
-    out_dir = os.path.dirname(os.path.abspath(__file__))
+    out_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output_images")
     os.makedirs(out_dir, exist_ok=True)
 
     if not images:
@@ -147,7 +147,7 @@ def main() -> None:
             ax.set_xticklabels(["Sobel", "Canny"])
             ax.set_ylabel(label)
             ax.set_title(label)
-        fig.suptitle(f"Sobel vs Canny — {disp} (folder: {folder})")
+        fig.suptitle(f"Sobel vs Canny - {disp} (folder: {folder})")
         plt.tight_layout()
         safe = disp.replace(" ", "_")
         plt.savefig(os.path.join(out_dir, f"bar_{safe}.png"), dpi=150)
@@ -171,7 +171,7 @@ def main() -> None:
             )
         elif c_d > s_d + 0.05:
             rec = (
-                f"For {disp}, Canny marks more edge pixels than Sobel-Otsu here—inspect for texture noise; "
+                f"For {disp}, Canny marks more edge pixels than Sobel-Otsu here; inspect for texture noise. "
                 "Sobel-Otsu may give smoother continuity if Canny fragments thin structures."
             )
         else:
